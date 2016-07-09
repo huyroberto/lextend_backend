@@ -1,0 +1,27 @@
+Supported Language
+{
+  "langMap": {
+    "kor": "Korean",
+    "jpn": "Japanese",
+    "zho": "Simplified Chinese",
+    "zht": "Traditional Chinese",
+    "deu": "Germany",
+    "fra": "France",
+    "vie": "Vietnamese",
+    "eng": "English"
+  },
+  "languagePairs": [
+    {
+      "langid": "eng",
+      "vialangid": "vie"
+    },
+    {
+      "langid": "deu",
+      "vialangid": "eng"
+    },
+    {
+      "langid": "eng",
+      "vialangid": "deu"
+    }
+  ]
+}
