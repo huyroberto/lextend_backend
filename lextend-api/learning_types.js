@@ -24,6 +24,11 @@ ttypes.WORDSTATUS = {
   'WORD_LEARNING' : 1,
   'WORD_NEW' : 2
 };
+ttypes.MATERIALSTATUS = {
+  'NEW' : 0,
+  'READING' : 1,
+  'FINISHED' : 2
+};
 ttypes.MaterialType = {
   'GRAMMAR_POINT' : 1,
   'READING_STORY' : 2,
@@ -449,6 +454,7 @@ var BilingualSentence = module.exports.BilingualSentence = function(args) {
   this.transUri = null;
   this.wordTokenSequence = null;
   this.indexedWords = null;
+  this.extras = null;
   if (args) {
     if (args.sentence !== undefined && args.sentence !== null) {
       this.sentence = args.sentence;
@@ -483,6 +489,9 @@ var BilingualSentence = module.exports.BilingualSentence = function(args) {
     }
     if (args.indexedWords !== undefined && args.indexedWords !== null) {
       this.indexedWords = Thrift.copyList(args.indexedWords, [null]);
+    }
+    if (args.extras !== undefined && args.extras !== null) {
+      this.extras = Thrift.copyMap(args.extras, [null]);
     }
   }
 };
@@ -584,6 +593,30 @@ BilingualSentence.prototype.read = function(input) {
         input.skip(ftype);
       }
       break;
+      case 11:
+      if (ftype == Thrift.Type.MAP) {
+        var _size15 = 0;
+        var _rtmp319;
+        this.extras = {};
+        var _ktype16 = 0;
+        var _vtype17 = 0;
+        _rtmp319 = input.readMapBegin();
+        _ktype16 = _rtmp319.ktype;
+        _vtype17 = _rtmp319.vtype;
+        _size15 = _rtmp319.size;
+        for (var _i20 = 0; _i20 < _size15; ++_i20)
+        {
+          var key21 = null;
+          var val22 = null;
+          key21 = input.readString();
+          val22 = input.readString();
+          this.extras[key21] = val22;
+        }
+        input.readMapEnd();
+      } else {
+        input.skip(ftype);
+      }
+      break;
       default:
         input.skip(ftype);
     }
@@ -643,15 +676,30 @@ BilingualSentence.prototype.write = function(output) {
   if (this.indexedWords !== null && this.indexedWords !== undefined) {
     output.writeFieldBegin('indexedWords', Thrift.Type.LIST, 10);
     output.writeListBegin(Thrift.Type.STRING, this.indexedWords.length);
-    for (var iter15 in this.indexedWords)
+    for (var iter23 in this.indexedWords)
     {
-      if (this.indexedWords.hasOwnProperty(iter15))
+      if (this.indexedWords.hasOwnProperty(iter23))
       {
-        iter15 = this.indexedWords[iter15];
-        output.writeString(iter15);
+        iter23 = this.indexedWords[iter23];
+        output.writeString(iter23);
       }
     }
     output.writeListEnd();
+    output.writeFieldEnd();
+  }
+  if (this.extras !== null && this.extras !== undefined) {
+    output.writeFieldBegin('extras', Thrift.Type.MAP, 11);
+    output.writeMapBegin(Thrift.Type.STRING, Thrift.Type.STRING, Thrift.objectLength(this.extras));
+    for (var kiter24 in this.extras)
+    {
+      if (this.extras.hasOwnProperty(kiter24))
+      {
+        var viter25 = this.extras[kiter24];
+        output.writeString(kiter24);
+        output.writeString(viter25);
+      }
+    }
+    output.writeMapEnd();
     output.writeFieldEnd();
   }
   output.writeFieldStop();
@@ -683,19 +731,19 @@ ExampleList.prototype.read = function(input) {
     {
       case 1:
       if (ftype == Thrift.Type.LIST) {
-        var _size16 = 0;
-        var _rtmp320;
+        var _size26 = 0;
+        var _rtmp330;
         this.examples = [];
-        var _etype19 = 0;
-        _rtmp320 = input.readListBegin();
-        _etype19 = _rtmp320.etype;
-        _size16 = _rtmp320.size;
-        for (var _i21 = 0; _i21 < _size16; ++_i21)
+        var _etype29 = 0;
+        _rtmp330 = input.readListBegin();
+        _etype29 = _rtmp330.etype;
+        _size26 = _rtmp330.size;
+        for (var _i31 = 0; _i31 < _size26; ++_i31)
         {
-          var elem22 = null;
-          elem22 = new ttypes.BilingualSentence();
-          elem22.read(input);
-          this.examples.push(elem22);
+          var elem32 = null;
+          elem32 = new ttypes.BilingualSentence();
+          elem32.read(input);
+          this.examples.push(elem32);
         }
         input.readListEnd();
       } else {
@@ -719,12 +767,12 @@ ExampleList.prototype.write = function(output) {
   if (this.examples !== null && this.examples !== undefined) {
     output.writeFieldBegin('examples', Thrift.Type.LIST, 1);
     output.writeListBegin(Thrift.Type.STRUCT, this.examples.length);
-    for (var iter23 in this.examples)
+    for (var iter33 in this.examples)
     {
-      if (this.examples.hasOwnProperty(iter23))
+      if (this.examples.hasOwnProperty(iter33))
       {
-        iter23 = this.examples[iter23];
-        iter23.write(output);
+        iter33 = this.examples[iter33];
+        iter33.write(output);
       }
     }
     output.writeListEnd();
@@ -816,22 +864,22 @@ UserWord.prototype.read = function(input) {
       break;
       case 4:
       if (ftype == Thrift.Type.MAP) {
-        var _size24 = 0;
-        var _rtmp328;
+        var _size34 = 0;
+        var _rtmp338;
         this.langidToDesp = {};
-        var _ktype25 = 0;
-        var _vtype26 = 0;
-        _rtmp328 = input.readMapBegin();
-        _ktype25 = _rtmp328.ktype;
-        _vtype26 = _rtmp328.vtype;
-        _size24 = _rtmp328.size;
-        for (var _i29 = 0; _i29 < _size24; ++_i29)
+        var _ktype35 = 0;
+        var _vtype36 = 0;
+        _rtmp338 = input.readMapBegin();
+        _ktype35 = _rtmp338.ktype;
+        _vtype36 = _rtmp338.vtype;
+        _size34 = _rtmp338.size;
+        for (var _i39 = 0; _i39 < _size34; ++_i39)
         {
-          var key30 = null;
-          var val31 = null;
-          key30 = input.readString();
-          val31 = input.readString();
-          this.langidToDesp[key30] = val31;
+          var key40 = null;
+          var val41 = null;
+          key40 = input.readString();
+          val41 = input.readString();
+          this.langidToDesp[key40] = val41;
         }
         input.readMapEnd();
       } else {
@@ -854,19 +902,19 @@ UserWord.prototype.read = function(input) {
       break;
       case 7:
       if (ftype == Thrift.Type.LIST) {
-        var _size32 = 0;
-        var _rtmp336;
+        var _size42 = 0;
+        var _rtmp346;
         this.examples = [];
-        var _etype35 = 0;
-        _rtmp336 = input.readListBegin();
-        _etype35 = _rtmp336.etype;
-        _size32 = _rtmp336.size;
-        for (var _i37 = 0; _i37 < _size32; ++_i37)
+        var _etype45 = 0;
+        _rtmp346 = input.readListBegin();
+        _etype45 = _rtmp346.etype;
+        _size42 = _rtmp346.size;
+        for (var _i47 = 0; _i47 < _size42; ++_i47)
         {
-          var elem38 = null;
-          elem38 = new ttypes.BilingualSentence();
-          elem38.read(input);
-          this.examples.push(elem38);
+          var elem48 = null;
+          elem48 = new ttypes.BilingualSentence();
+          elem48.read(input);
+          this.examples.push(elem48);
         }
         input.readListEnd();
       } else {
@@ -916,13 +964,13 @@ UserWord.prototype.write = function(output) {
   if (this.langidToDesp !== null && this.langidToDesp !== undefined) {
     output.writeFieldBegin('langidToDesp', Thrift.Type.MAP, 4);
     output.writeMapBegin(Thrift.Type.STRING, Thrift.Type.STRING, Thrift.objectLength(this.langidToDesp));
-    for (var kiter39 in this.langidToDesp)
+    for (var kiter49 in this.langidToDesp)
     {
-      if (this.langidToDesp.hasOwnProperty(kiter39))
+      if (this.langidToDesp.hasOwnProperty(kiter49))
       {
-        var viter40 = this.langidToDesp[kiter39];
-        output.writeString(kiter39);
-        output.writeString(viter40);
+        var viter50 = this.langidToDesp[kiter49];
+        output.writeString(kiter49);
+        output.writeString(viter50);
       }
     }
     output.writeMapEnd();
@@ -941,12 +989,12 @@ UserWord.prototype.write = function(output) {
   if (this.examples !== null && this.examples !== undefined) {
     output.writeFieldBegin('examples', Thrift.Type.LIST, 7);
     output.writeListBegin(Thrift.Type.STRUCT, this.examples.length);
-    for (var iter41 in this.examples)
+    for (var iter51 in this.examples)
     {
-      if (this.examples.hasOwnProperty(iter41))
+      if (this.examples.hasOwnProperty(iter51))
       {
-        iter41 = this.examples[iter41];
-        iter41.write(output);
+        iter51 = this.examples[iter51];
+        iter51.write(output);
       }
     }
     output.writeListEnd();
@@ -1077,18 +1125,18 @@ Sentence.prototype.read = function(input) {
       break;
       case 8:
       if (ftype == Thrift.Type.LIST) {
-        var _size42 = 0;
-        var _rtmp346;
+        var _size52 = 0;
+        var _rtmp356;
         this.indexedWords = [];
-        var _etype45 = 0;
-        _rtmp346 = input.readListBegin();
-        _etype45 = _rtmp346.etype;
-        _size42 = _rtmp346.size;
-        for (var _i47 = 0; _i47 < _size42; ++_i47)
+        var _etype55 = 0;
+        _rtmp356 = input.readListBegin();
+        _etype55 = _rtmp356.etype;
+        _size52 = _rtmp356.size;
+        for (var _i57 = 0; _i57 < _size52; ++_i57)
         {
-          var elem48 = null;
-          elem48 = input.readString();
-          this.indexedWords.push(elem48);
+          var elem58 = null;
+          elem58 = input.readString();
+          this.indexedWords.push(elem58);
         }
         input.readListEnd();
       } else {
@@ -1151,12 +1199,12 @@ Sentence.prototype.write = function(output) {
   if (this.indexedWords !== null && this.indexedWords !== undefined) {
     output.writeFieldBegin('indexedWords', Thrift.Type.LIST, 8);
     output.writeListBegin(Thrift.Type.STRING, this.indexedWords.length);
-    for (var iter49 in this.indexedWords)
+    for (var iter59 in this.indexedWords)
     {
-      if (this.indexedWords.hasOwnProperty(iter49))
+      if (this.indexedWords.hasOwnProperty(iter59))
       {
-        iter49 = this.indexedWords[iter49];
-        output.writeString(iter49);
+        iter59 = this.indexedWords[iter59];
+        output.writeString(iter59);
       }
     }
     output.writeListEnd();
@@ -1534,18 +1582,18 @@ Wordbook.prototype.read = function(input) {
       break;
       case 3:
       if (ftype == Thrift.Type.SET) {
-        var _size50 = 0;
-        var _rtmp354;
+        var _size60 = 0;
+        var _rtmp364;
         this.words = [];
-        var _etype53 = 0;
-        _rtmp354 = input.readSetBegin();
-        _etype53 = _rtmp354.etype;
-        _size50 = _rtmp354.size;
-        for (var _i55 = 0; _i55 < _size50; ++_i55)
+        var _etype63 = 0;
+        _rtmp364 = input.readSetBegin();
+        _etype63 = _rtmp364.etype;
+        _size60 = _rtmp364.size;
+        for (var _i65 = 0; _i65 < _size60; ++_i65)
         {
-          var elem56 = null;
-          elem56 = input.readString();
-          this.words.push(elem56);
+          var elem66 = null;
+          elem66 = input.readString();
+          this.words.push(elem66);
         }
         input.readSetEnd();
       } else {
@@ -1618,12 +1666,12 @@ Wordbook.prototype.write = function(output) {
   if (this.words !== null && this.words !== undefined) {
     output.writeFieldBegin('words', Thrift.Type.SET, 3);
     output.writeSetBegin(Thrift.Type.STRING, this.words.length);
-    for (var iter57 in this.words)
+    for (var iter67 in this.words)
     {
-      if (this.words.hasOwnProperty(iter57))
+      if (this.words.hasOwnProperty(iter67))
       {
-        iter57 = this.words[iter57];
-        output.writeString(iter57);
+        iter67 = this.words[iter67];
+        output.writeString(iter67);
       }
     }
     output.writeSetEnd();
@@ -1718,22 +1766,22 @@ LearningRecord.prototype.read = function(input) {
       break;
       case 3:
       if (ftype == Thrift.Type.MAP) {
-        var _size58 = 0;
-        var _rtmp362;
+        var _size68 = 0;
+        var _rtmp372;
         this.timeToLookupActivities = {};
-        var _ktype59 = 0;
-        var _vtype60 = 0;
-        _rtmp362 = input.readMapBegin();
-        _ktype59 = _rtmp362.ktype;
-        _vtype60 = _rtmp362.vtype;
-        _size58 = _rtmp362.size;
-        for (var _i63 = 0; _i63 < _size58; ++_i63)
+        var _ktype69 = 0;
+        var _vtype70 = 0;
+        _rtmp372 = input.readMapBegin();
+        _ktype69 = _rtmp372.ktype;
+        _vtype70 = _rtmp372.vtype;
+        _size68 = _rtmp372.size;
+        for (var _i73 = 0; _i73 < _size68; ++_i73)
         {
-          var key64 = null;
-          var val65 = null;
-          key64 = input.readI64();
-          val65 = input.readI32();
-          this.timeToLookupActivities[key64] = val65;
+          var key74 = null;
+          var val75 = null;
+          key74 = input.readI64();
+          val75 = input.readI32();
+          this.timeToLookupActivities[key74] = val75;
         }
         input.readMapEnd();
       } else {
@@ -1742,22 +1790,22 @@ LearningRecord.prototype.read = function(input) {
       break;
       case 4:
       if (ftype == Thrift.Type.MAP) {
-        var _size66 = 0;
-        var _rtmp370;
+        var _size76 = 0;
+        var _rtmp380;
         this.timeToTestScores = {};
-        var _ktype67 = 0;
-        var _vtype68 = 0;
-        _rtmp370 = input.readMapBegin();
-        _ktype67 = _rtmp370.ktype;
-        _vtype68 = _rtmp370.vtype;
-        _size66 = _rtmp370.size;
-        for (var _i71 = 0; _i71 < _size66; ++_i71)
+        var _ktype77 = 0;
+        var _vtype78 = 0;
+        _rtmp380 = input.readMapBegin();
+        _ktype77 = _rtmp380.ktype;
+        _vtype78 = _rtmp380.vtype;
+        _size76 = _rtmp380.size;
+        for (var _i81 = 0; _i81 < _size76; ++_i81)
         {
-          var key72 = null;
-          var val73 = null;
-          key72 = input.readI64();
-          val73 = input.readI32();
-          this.timeToTestScores[key72] = val73;
+          var key82 = null;
+          var val83 = null;
+          key82 = input.readI64();
+          val83 = input.readI32();
+          this.timeToTestScores[key82] = val83;
         }
         input.readMapEnd();
       } else {
@@ -1788,13 +1836,13 @@ LearningRecord.prototype.write = function(output) {
   if (this.timeToLookupActivities !== null && this.timeToLookupActivities !== undefined) {
     output.writeFieldBegin('timeToLookupActivities', Thrift.Type.MAP, 3);
     output.writeMapBegin(Thrift.Type.I64, Thrift.Type.I32, Thrift.objectLength(this.timeToLookupActivities));
-    for (var kiter74 in this.timeToLookupActivities)
+    for (var kiter84 in this.timeToLookupActivities)
     {
-      if (this.timeToLookupActivities.hasOwnProperty(kiter74))
+      if (this.timeToLookupActivities.hasOwnProperty(kiter84))
       {
-        var viter75 = this.timeToLookupActivities[kiter74];
-        output.writeI64(kiter74);
-        output.writeI32(viter75);
+        var viter85 = this.timeToLookupActivities[kiter84];
+        output.writeI64(kiter84);
+        output.writeI32(viter85);
       }
     }
     output.writeMapEnd();
@@ -1803,13 +1851,13 @@ LearningRecord.prototype.write = function(output) {
   if (this.timeToTestScores !== null && this.timeToTestScores !== undefined) {
     output.writeFieldBegin('timeToTestScores', Thrift.Type.MAP, 4);
     output.writeMapBegin(Thrift.Type.I64, Thrift.Type.I32, Thrift.objectLength(this.timeToTestScores));
-    for (var kiter76 in this.timeToTestScores)
+    for (var kiter86 in this.timeToTestScores)
     {
-      if (this.timeToTestScores.hasOwnProperty(kiter76))
+      if (this.timeToTestScores.hasOwnProperty(kiter86))
       {
-        var viter77 = this.timeToTestScores[kiter76];
-        output.writeI64(kiter76);
-        output.writeI32(viter77);
+        var viter87 = this.timeToTestScores[kiter86];
+        output.writeI64(kiter86);
+        output.writeI32(viter87);
       }
     }
     output.writeMapEnd();
@@ -1826,7 +1874,7 @@ var MaterialSummary = module.exports.MaterialSummary = function(args) {
   this.summary = null;
   this.numLikes = null;
   this.numComments = null;
-  this.materialType = null;
+  this.materialType = 2;
   this.picUri = null;
   this.audioUri = null;
   this.videoUri = null;
@@ -1836,6 +1884,8 @@ var MaterialSummary = module.exports.MaterialSummary = function(args) {
   this.userLiked = null;
   this.langid = null;
   this.vialangid = null;
+  this.estimatedLevel = null;
+  this.readStatus = null;
   if (args) {
     if (args.materialUri !== undefined && args.materialUri !== null) {
       this.materialUri = args.materialUri;
@@ -1885,6 +1935,12 @@ var MaterialSummary = module.exports.MaterialSummary = function(args) {
     }
     if (args.vialangid !== undefined && args.vialangid !== null) {
       this.vialangid = args.vialangid;
+    }
+    if (args.estimatedLevel !== undefined && args.estimatedLevel !== null) {
+      this.estimatedLevel = args.estimatedLevel;
+    }
+    if (args.readStatus !== undefined && args.readStatus !== null) {
+      this.readStatus = args.readStatus;
     }
   }
 };
@@ -1967,18 +2023,18 @@ MaterialSummary.prototype.read = function(input) {
       break;
       case 10:
       if (ftype == Thrift.Type.LIST) {
-        var _size78 = 0;
-        var _rtmp382;
+        var _size88 = 0;
+        var _rtmp392;
         this.highlights = [];
-        var _etype81 = 0;
-        _rtmp382 = input.readListBegin();
-        _etype81 = _rtmp382.etype;
-        _size78 = _rtmp382.size;
-        for (var _i83 = 0; _i83 < _size78; ++_i83)
+        var _etype91 = 0;
+        _rtmp392 = input.readListBegin();
+        _etype91 = _rtmp392.etype;
+        _size88 = _rtmp392.size;
+        for (var _i93 = 0; _i93 < _size88; ++_i93)
         {
-          var elem84 = null;
-          elem84 = input.readString();
-          this.highlights.push(elem84);
+          var elem94 = null;
+          elem94 = input.readString();
+          this.highlights.push(elem94);
         }
         input.readListEnd();
       } else {
@@ -2016,6 +2072,20 @@ MaterialSummary.prototype.read = function(input) {
       case 15:
       if (ftype == Thrift.Type.STRING) {
         this.vialangid = input.readString();
+      } else {
+        input.skip(ftype);
+      }
+      break;
+      case 16:
+      if (ftype == Thrift.Type.I32) {
+        this.estimatedLevel = input.readI32();
+      } else {
+        input.skip(ftype);
+      }
+      break;
+      case 17:
+      if (ftype == Thrift.Type.I32) {
+        this.readStatus = input.readI32();
       } else {
         input.skip(ftype);
       }
@@ -2079,12 +2149,12 @@ MaterialSummary.prototype.write = function(output) {
   if (this.highlights !== null && this.highlights !== undefined) {
     output.writeFieldBegin('highlights', Thrift.Type.LIST, 10);
     output.writeListBegin(Thrift.Type.STRING, this.highlights.length);
-    for (var iter85 in this.highlights)
+    for (var iter95 in this.highlights)
     {
-      if (this.highlights.hasOwnProperty(iter85))
+      if (this.highlights.hasOwnProperty(iter95))
       {
-        iter85 = this.highlights[iter85];
-        output.writeString(iter85);
+        iter95 = this.highlights[iter95];
+        output.writeString(iter95);
       }
     }
     output.writeListEnd();
@@ -2115,6 +2185,16 @@ MaterialSummary.prototype.write = function(output) {
     output.writeString(this.vialangid);
     output.writeFieldEnd();
   }
+  if (this.estimatedLevel !== null && this.estimatedLevel !== undefined) {
+    output.writeFieldBegin('estimatedLevel', Thrift.Type.I32, 16);
+    output.writeI32(this.estimatedLevel);
+    output.writeFieldEnd();
+  }
+  if (this.readStatus !== null && this.readStatus !== undefined) {
+    output.writeFieldBegin('readStatus', Thrift.Type.I32, 17);
+    output.writeI32(this.readStatus);
+    output.writeFieldEnd();
+  }
   output.writeFieldStop();
   output.writeStructEnd();
   return;
@@ -2136,6 +2216,7 @@ var Material = module.exports.Material = function(args) {
   this.videoUri = null;
   this.USN = null;
   this.modifiedTime = null;
+  this.estimatedLevel = null;
   if (args) {
     if (args.langid !== undefined && args.langid !== null) {
       this.langid = args.langid;
@@ -2189,6 +2270,9 @@ var Material = module.exports.Material = function(args) {
     }
     if (args.modifiedTime !== undefined && args.modifiedTime !== null) {
       this.modifiedTime = args.modifiedTime;
+    }
+    if (args.estimatedLevel !== undefined && args.estimatedLevel !== null) {
+      this.estimatedLevel = args.estimatedLevel;
     }
   }
 };
@@ -2311,6 +2395,13 @@ Material.prototype.read = function(input) {
         input.skip(ftype);
       }
       break;
+      case 16:
+      if (ftype == Thrift.Type.I32) {
+        this.estimatedLevel = input.readI32();
+      } else {
+        input.skip(ftype);
+      }
+      break;
       default:
         input.skip(ftype);
     }
@@ -2397,6 +2488,11 @@ Material.prototype.write = function(output) {
     output.writeI64(this.modifiedTime);
     output.writeFieldEnd();
   }
+  if (this.estimatedLevel !== null && this.estimatedLevel !== undefined) {
+    output.writeFieldBegin('estimatedLevel', Thrift.Type.I32, 16);
+    output.writeI32(this.estimatedLevel);
+    output.writeFieldEnd();
+  }
   output.writeFieldStop();
   output.writeStructEnd();
   return;
@@ -2477,23 +2573,23 @@ MaterialAnnot.prototype.read = function(input) {
       break;
       case 5:
       if (ftype == Thrift.Type.MAP) {
-        var _size86 = 0;
-        var _rtmp390;
+        var _size96 = 0;
+        var _rtmp3100;
         this.langidToContentWords = {};
-        var _ktype87 = 0;
-        var _vtype88 = 0;
-        _rtmp390 = input.readMapBegin();
-        _ktype87 = _rtmp390.ktype;
-        _vtype88 = _rtmp390.vtype;
-        _size86 = _rtmp390.size;
-        for (var _i91 = 0; _i91 < _size86; ++_i91)
+        var _ktype97 = 0;
+        var _vtype98 = 0;
+        _rtmp3100 = input.readMapBegin();
+        _ktype97 = _rtmp3100.ktype;
+        _vtype98 = _rtmp3100.vtype;
+        _size96 = _rtmp3100.size;
+        for (var _i101 = 0; _i101 < _size96; ++_i101)
         {
-          var key92 = null;
-          var val93 = null;
-          key92 = input.readString();
-          val93 = new annot_ttypes.AnnotationSequence();
-          val93.read(input);
-          this.langidToContentWords[key92] = val93;
+          var key102 = null;
+          var val103 = null;
+          key102 = input.readString();
+          val103 = new annot_ttypes.AnnotationSequence();
+          val103.read(input);
+          this.langidToContentWords[key102] = val103;
         }
         input.readMapEnd();
       } else {
@@ -2534,13 +2630,13 @@ MaterialAnnot.prototype.write = function(output) {
   if (this.langidToContentWords !== null && this.langidToContentWords !== undefined) {
     output.writeFieldBegin('langidToContentWords', Thrift.Type.MAP, 5);
     output.writeMapBegin(Thrift.Type.STRING, Thrift.Type.STRUCT, Thrift.objectLength(this.langidToContentWords));
-    for (var kiter94 in this.langidToContentWords)
+    for (var kiter104 in this.langidToContentWords)
     {
-      if (this.langidToContentWords.hasOwnProperty(kiter94))
+      if (this.langidToContentWords.hasOwnProperty(kiter104))
       {
-        var viter95 = this.langidToContentWords[kiter94];
-        output.writeString(kiter94);
-        viter95.write(output);
+        var viter105 = this.langidToContentWords[kiter104];
+        output.writeString(kiter104);
+        viter105.write(output);
       }
     }
     output.writeMapEnd();
@@ -2625,18 +2721,18 @@ ReadingRecord.prototype.read = function(input) {
       break;
       case 5:
       if (ftype == Thrift.Type.LIST) {
-        var _size96 = 0;
-        var _rtmp3100;
+        var _size106 = 0;
+        var _rtmp3110;
         this.lookupWords = [];
-        var _etype99 = 0;
-        _rtmp3100 = input.readListBegin();
-        _etype99 = _rtmp3100.etype;
-        _size96 = _rtmp3100.size;
-        for (var _i101 = 0; _i101 < _size96; ++_i101)
+        var _etype109 = 0;
+        _rtmp3110 = input.readListBegin();
+        _etype109 = _rtmp3110.etype;
+        _size106 = _rtmp3110.size;
+        for (var _i111 = 0; _i111 < _size106; ++_i111)
         {
-          var elem102 = null;
-          elem102 = input.readString();
-          this.lookupWords.push(elem102);
+          var elem112 = null;
+          elem112 = input.readString();
+          this.lookupWords.push(elem112);
         }
         input.readListEnd();
       } else {
@@ -2684,12 +2780,12 @@ ReadingRecord.prototype.write = function(output) {
   if (this.lookupWords !== null && this.lookupWords !== undefined) {
     output.writeFieldBegin('lookupWords', Thrift.Type.LIST, 5);
     output.writeListBegin(Thrift.Type.STRING, this.lookupWords.length);
-    for (var iter103 in this.lookupWords)
+    for (var iter113 in this.lookupWords)
     {
-      if (this.lookupWords.hasOwnProperty(iter103))
+      if (this.lookupWords.hasOwnProperty(iter113))
       {
-        iter103 = this.lookupWords[iter103];
-        output.writeString(iter103);
+        iter113 = this.lookupWords[iter113];
+        output.writeString(iter113);
       }
     }
     output.writeListEnd();
